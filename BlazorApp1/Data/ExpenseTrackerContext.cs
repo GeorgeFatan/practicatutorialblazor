@@ -11,9 +11,11 @@ namespace BlazorApp1.Data
         }
 
         public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Expense> Expenses { get; set; }
+        public virtual DbSet<Income> Incomes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        {    //categori
             modelBuilder.Entity<Category>()
                 .HasData(new Category[]
                 {
@@ -25,6 +27,13 @@ namespace BlazorApp1.Data
                 new Category() {Id=6, Name="House" },
 
             });
+            //expenses
+            modelBuilder.Entity<Expense>()
+               .HasOne(e => e.Category)
+               .WithMany() 
+               .HasForeignKey(e => e.CategoryId);
+
+         
         }
     }
 }

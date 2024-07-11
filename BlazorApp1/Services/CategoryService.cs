@@ -24,6 +24,7 @@ namespace BlazorApp1.Services
         {
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
+
         }
 
         public async Task DeleteCategoryAsync(Category category)
