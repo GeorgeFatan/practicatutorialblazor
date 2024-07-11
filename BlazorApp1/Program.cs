@@ -1,4 +1,7 @@
 using BlazorApp1.Components;
+using BlazorApp1.Components.Pages;
+using BlazorApp1.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorApp1
 {
@@ -11,6 +14,13 @@ namespace BlazorApp1
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+           
+            
+            //configuram baza de date
+
+            builder.Services.AddDbContext<ExpenseTrackerContext>(options =>
+                options.UseNpgsql(builder.Configuration.GetConnectionString("ExpenseTrackerDatabase"))
+            );
 
             var app = builder.Build();
 
