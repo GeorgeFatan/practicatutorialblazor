@@ -1,7 +1,59 @@
 ﻿@page "/categories"
+@using BlazorApp1.Services
+@using BlazorApp1.Data.Models
+@inject CategoryService Service
+@rendermode InteractiveServer
+
 
 <h3>Categories</h3>
 
-@code {
+<ul>
+    @foreach (var category in categories)
+    {
+        <li>
+            @category.Id: @category.Name
+            <button @onclick="() => DeleteCategory(category)">Delete</button>
+        </li>
+    }
+</ul>
 
+<h3>Add New Category</h3>
+
+<form @onsubmit="HandleAddCategory">
+    <label>
+        Id:
+        <input type="number" @bind="newCategory.Id" required />
+    </label>
+    <br />
+    <label>
+        Name:
+        <input type="text" @bind="newCategory.Name" required />
+    </label>
+    <br />
+    <button type="submit" @onclick="HandleAddCategory">Add Category</button>
+</form>
+
+@code {
+    private List<Category> categories = new List<Category>();
+    private Category newCategory = new Category();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await Service.GetCategoriesAsync();
+    }
+
+    private async Task HandleAddCategory()
+    {
+        await Service.AddCategoryAsync(newCategory);
+        categories = await Service.GetCategoriesAsync(); 
+        newCategory = new Category(); 
+        StateHasChanged(); 
+    }
+
+    private async Task DeleteCategory(Category category)
+    {
+        await Service.DeleteCategoryAsync(category);
+        categories.Remove(category); 
+        StateHasChanged(); 
+    }
 }
