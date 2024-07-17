@@ -1,0 +1,68 @@
+﻿@page "/expenses/new"
+@using BlazorApp1.Data.Models
+@using BlazorApp1.Services
+@inject ExpenseService ExpenseService
+@inject CategoryService CategoryService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Add Expense</h3>
+
+@if (categories == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="newExpense" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText id="title" class="form-control" @bind-Value="newExpense.Title" />
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <InputDate id="date" class="form-control" @bind-Value="newExpense.Date" />
+        </div>
+        <div class="form-group">
+            <label for="amount">Amount</label>
+            <InputNumber id="amount" class="form-control" @bind-Value="newExpense.Amount" />
+        </div>
+        <div class="form-group">
+            <label for="planned">Planned</label>
+            <InputSelect id="planned" class="form-control" @bind-Value="newExpense.Planned">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <InputSelect id="category" class="form-control" @bind-Value="newExpense.CategoryId">
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+@code {
+    private Expense newExpense = new Expense();
+    private List<Category> categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetCategoriesAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ExpenseService.AddExpenseAsync(newExpense);
+        Navigation.NavigateTo("/expenses");
+    }
+}

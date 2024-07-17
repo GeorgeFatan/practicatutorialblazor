@@ -1,0 +1,76 @@
+﻿@page "/expenses"
+@using BlazorApp1.Services
+@using BlazorApp1.Data.Models
+@inject ExpenseService Service
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<h3>Expenses</h3>
+
+<button class="btn btn-primary mb-3" @onclick="NavigateToAddExpense">Add Expense</button>
+
+@if (expenses == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!expenses.Any())
+{
+    <p>No expenses available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Planned</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var expense in expenses)
+            {
+                <tr>
+                    <td>@expense.Title</td>
+                    <td>@expense.Date.ToString("yyyy-MM-dd")</td>
+                    <td>@expense.Amount</td>
+                    <td>@(expense.Planned ? "Yes" : "No")</td>
+                    <td>@expense.Category?.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditExpense(expense.Id)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteExpense(expense.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Expense> expenses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        expenses = (await Service.GetAllExpensesAsync()).ToList();
+    }
+
+    private void NavigateToAddExpense()
+    {
+        Navigation.NavigateTo("/expenses/new");
+    }
+
+    private void EditExpense(int id)
+    {
+        Navigation.NavigateTo($"/expenses/edit/{id}");
+    }
+
+    private async Task DeleteExpense(int id)
+    {
+        await Service.DeleteExpenseAsync(id);
+        expenses = (await Service.GetAllExpensesAsync()).ToList(); // Refresh the expenses list
+        StateHasChanged();
+    }
+}

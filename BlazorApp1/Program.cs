@@ -1,4 +1,4 @@
-using BlazorApp1.Components;
+﻿using BlazorApp1.Components;
 using BlazorApp1.Components.Pages;
 using BlazorApp1.Data;
 using BlazorApp1.Services;
@@ -15,17 +15,15 @@ namespace BlazorApp1
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
-           
-            
-            //configuram baza de date
+
+            // Configurăm baza de date
             builder.Services.AddDbContext<ExpenseTrackerContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("ExpenseTrackerDatabase"))
             );
 
-            //adaugam serviciul CategoryService
+            // Adăugăm serviciile necesare
             builder.Services.AddScoped<CategoryService>();
-
-          
+            builder.Services.AddScoped<ExpenseService>();
 
             var app = builder.Build();
 
@@ -33,12 +31,10 @@ namespace BlazorApp1
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-
             app.UseStaticFiles();
             app.UseAntiforgery();
 
