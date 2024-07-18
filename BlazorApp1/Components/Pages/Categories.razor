@@ -1,59 +1,63 @@
 ﻿@page "/categories"
 @using BlazorApp1.Services
 @using BlazorApp1.Data.Models
-@inject CategoryService Service
+@inject CategoryService CategoryService
+@inject NavigationManager Navigation
 @rendermode InteractiveServer
-
 
 <h3>Categories</h3>
 
-<ul>
-    @foreach (var category in categories)
-    {
-        <li>
-            @category.Id: @category.Name
-            <button @onclick="() => DeleteCategory(category)">Delete</button>
-        </li>
-    }
-</ul>
+@if (categories == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!categories.Any())
+{
+    <p>No categories available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+                <th>View Expenses</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in categories)
+            {
+                <tr>
+                    <td>@category.Name</td>
+                    <td>
+                        
+                    </td>
+                    <td>
+                        <a href="/categories/@category.Id/expenses" class="btn btn-info btn-sm">View Expenses</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
-<h3>Add New Category</h3>
-
-<form @onsubmit="HandleAddCategory">
-    <label>
-        Id:
-        <input type="number" @bind="newCategory.Id" required />
-    </label>
-    <br />
-    <label>
-        Name:
-        <input type="text" @bind="newCategory.Name" required />
-    </label>
-    <br />
-    <button type="submit" @onclick="HandleAddCategory">Add Category</button>
-</form>
+<button class="btn btn-primary" @onclick="NavigateToAddCategory">Add Category</button>
 
 @code {
-    private List<Category> categories = new List<Category>();
-    private Category newCategory = new Category();
+    private List<Category> categories;
 
     protected override async Task OnInitializedAsync()
     {
-        categories = await Service.GetCategoriesAsync();
+        categories = (await CategoryService.GetCategoriesAsync()).ToList();
     }
 
-    private async Task HandleAddCategory()
+    private void NavigateToAddCategory()
     {
-        await Service.AddCategoryAsync(newCategory);
-        categories = await Service.GetCategoriesAsync(); 
-        newCategory = new Category(); 
-        StateHasChanged(); 
+        Navigation.NavigateTo("/categories/new");
     }
 
-    private async Task DeleteCategory(Category category)
-    {
-        await Service.DeleteCategoryAsync(category);
-        categories.Remove(category); 
-        StateHasChanged(); 
-    }
+  
+
+  
 }

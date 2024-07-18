@@ -1,0 +1,52 @@
+﻿@page "/categories/{categoryId:int}/expenses"
+@using BlazorApp1.Services
+@using BlazorApp1.Data.Models
+@inject ExpenseService ExpenseService
+@rendermode InteractiveServer
+
+<h3>Expenses in Category</h3>
+
+@if (expenses == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!expenses.Any())
+{
+    <p>No expenses available for this category.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Planned</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var expense in expenses)
+            {
+                <tr>
+                    <td>@expense.Title</td>
+                    <td>@expense.Date.ToString("yyyy-MM-dd")</td>
+                    <td>@expense.Amount</td>
+                    <td>@(expense.Planned ? "Yes" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int categoryId { get; set; }
+
+    private List<Expense> expenses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        expenses = (await ExpenseService.GetExpensesByCategoryIdAsync(categoryId)).ToList();
+    }
+}

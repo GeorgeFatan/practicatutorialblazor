@@ -46,5 +46,14 @@ namespace BlazorApp1.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Expense>> GetExpensesByCategoryIdAsync(int categoryId)
+        {
+            return await _context.Expenses
+                                .Include(e => e.Category)
+                                .Where(e => e.CategoryId == categoryId)
+                                .ToListAsync();
+        }
+
     }
 }

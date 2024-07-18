@@ -1,0 +1,75 @@
+﻿
+@page "/incomes"
+@using BlazorApp1.Services
+@using BlazorApp1.Data.Models
+@inject IncomeService Service
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<h3>Incomes</h3>
+
+<button class="btn btn-primary mb-3" @onclick="NavigateToAddIncome">Add Income</button>
+
+@if (incomes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!incomes.Any())
+{
+    <p>No incomes available.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var income in incomes)
+            {
+                <tr>
+                    <td>@income.Title</td>
+                    <td>@income.Date.ToString("yyyy-MM-dd")</td>
+                    <td>@income.Amount</td>
+                    <td>@income.Type.ToString()</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditIncome(income.Id)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteIncome(income.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Income> incomes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        incomes = (await Service.GetAllIncomesAsync()).ToList();
+    }
+
+    private void NavigateToAddIncome()
+    {
+        Navigation.NavigateTo("/incomes/new");
+    }
+
+    private void EditIncome(int id)
+    {
+        Navigation.NavigateTo($"/incomes/edit/{id}");
+    }
+
+    private async Task DeleteIncome(int id)
+    {
+        await Service.DeleteIncomeAsync(id);
+        incomes = (await Service.GetAllIncomesAsync()).ToList(); // Refresh the incomes list
+        StateHasChanged();
+    }
+}

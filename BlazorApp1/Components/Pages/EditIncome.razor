@@ -1,0 +1,67 @@
+﻿@page "/incomes/edit/{incomeId:int}"
+@using BlazorApp1.Services
+@using BlazorApp1.Data.Models
+@inject IncomeService IncomeService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Edit Income</h3>
+
+@if (income == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@income" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText id="title" class="form-control" @bind-Value="income.Title" />
+        </div>
+        <div class="form-group">
+            <label for="date">Date</label>
+            <InputDate id="date" class="form-control" @bind-Value="income.Date" />
+        </div>
+        <div class="form-group">
+            <label for="amount">Amount</label>
+            <InputNumber id="amount" class="form-control" @bind-Value="income.Amount" />
+        </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <InputSelect id="type" class="form-control" @bind-Value="income.Type">
+                @foreach (var type in Enum.GetValues(typeof(IncomeType)))
+                {
+                    <option value="@type">@type.ToString()</option>
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int incomeId { get; set; }
+
+    private Income income;
+
+    protected override async Task OnInitializedAsync()
+    {
+        income = await IncomeService.GetIncomeByIdAsync(incomeId);
+
+        if (income == null)
+        {
+            Navigation.NavigateTo("/incomes");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await IncomeService.UpdateIncomeAsync(income);
+        Navigation.NavigateTo("/incomes");
+    }
+}

@@ -24,6 +24,7 @@ namespace BlazorApp1
             // Adăugăm serviciile necesare
             builder.Services.AddScoped<CategoryService>();
             builder.Services.AddScoped<ExpenseService>();
+            builder.Services.AddScoped<IncomeService>();
 
             var app = builder.Build();
 

@@ -14,6 +14,7 @@ namespace BlazorApp1.Data
         public virtual DbSet<Expense> Expenses { get; set; }
         public virtual DbSet<Income> Incomes { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {    //categori
             modelBuilder.Entity<Category>()
